@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="csrf-token" content="{{ csrf }}">
+<title>Pi Studio · Kiosk Photobooth</title>
+<link rel="stylesheet" href="/static/kiosk.css">
+<script src="/static/kiosk.js" defer></script>
+</head>
+<body class="kiosk-body">
+
+<header class="kiosk-header">
+  <div class="kiosk-brand">
+    ◉ PI STUDIO <span>KIOSK PHOTOBOOTH</span>
+  </div>
+  <div class="kiosk-status-badge">
+    <div class="status-indicator">
+      <span class="dot" id="kioskDot"></span>
+      <span id="kioskStatusText">Đang kết nối…</span>
+    </div>
+    <span id="kioskClock" style="color: var(--kiosk-muted);">--:--</span>
+  </div>
+</header>
+
+<main class="kiosk-stage">
+
+  <!-- View 1: Attract / Welcome Screen -->
+  <section class="kiosk-view view-welcome active" id="viewWelcome">
+    <div class="welcome-logo">◉</div>
+    <h1 class="welcome-title">Cười Lên Nào!</h1>
+    <p class="welcome-desc">Chào mừng bạn đến với quầy chụp ảnh tự động Pi Studio. Hãy bước lại gần hoặc giơ bàn tay mở để bắt đầu!</p>
+
+    <div class="welcome-gestures-guide">
+      <div class="gesture-guide-item">
+        <span class="gesture-icon">🖐</span>
+        <div class="gesture-text">
+          <strong>Bàn tay mở</strong>
+          <small>Bắt đầu chụp</small>
+        </div>
+      </div>
+      <div class="gesture-guide-item">
+        <span class="gesture-icon">👍</span>
+        <div class="gesture-text">
+          <strong>Ngón cái</strong>
+          <small>Chụp ảnh (3-2-1)</small>
+        </div>
+      </div>
+      <div class="gesture-guide-item">
+        <span class="gesture-icon">✌</span>
+        <div class="gesture-text">
+          <strong>Chữ V</strong>
+          <small>Đổi phụ kiện</small>
+        </div>
+      </div>
+      <div class="gesture-guide-item">
+        <span class="gesture-icon">✊</span>
+        <div class="gesture-text">
+          <strong>Nắm tay</strong>
+          <small>Hủy lượt chụp</small>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-big-start" id="btnKioskStart">BẮT ĐẦU CHỤP ẢNH</button>
+  </section>
+
+  <!-- View 2: Active Camera Studio -->
+  <section class="kiosk-view view-studio" id="viewStudio">
+    <div class="studio-main">
+      <div class="kiosk-viewfinder">
+        <img id="kioskPreview" alt="Xem trước camera">
+        <div id="kioskFlash"></div>
+        <div class="kiosk-countdown" id="kioskCountdown" hidden>3</div>
+        <div class="kiosk-progress" id="kioskProgress">Đã chụp 0 / 4</div>
+      </div>
+    </div>
+
+    <aside class="kiosk-sidebar">
+      <div class="kiosk-sidebar-panel">
+        <h3>CHỌN PHỤ KIỆN</h3>
+        <div class="filter-pills" id="kioskFilterPills">
+          <div class="filter-pill active" data-filter="none">Tự nhiên</div>
+          <div class="filter-pill" data-filter="glasses">Kính</div>
+          <div class="filter-pill" data-filter="hat">Mũ</div>
+          <div class="filter-pill" data-filter="mono">Đen trắng</div>
+          <div class="filter-pill" data-filter="sepia">Hoài cổ</div>
+        </div>
+      </div>
+
+      <div class="kiosk-gesture-banner" id="kioskGestureBanner">
+        Đang theo dõi cử chỉ tay…
+      </div>
+
+      <button class="btn-kiosk-snap" id="btnKioskSnap">📸 CHỤP ẢNH (👍)</button>
+      <button class="filter-pill" id="btnKioskLeave" style="background: transparent;">Nhường lượt cho người sau</button>
+    </aside>
+  </section>
+
+  <!-- View 3: Result & QR Code Download -->
+  <section class="kiosk-view view-result" id="viewResult">
+    <div class="result-photo-column">
+      <div class="result-photo-frame">
+        <img id="kioskResultImg" src="" alt="Ảnh Photostrip vừa chụp">
+      </div>
+    </div>
+
+    <div class="result-qr-column">
+      <span class="eyebrow" style="color: var(--kiosk-accent);">XONG RỒI ĐẤY!</span>
+      <h2>Khoảnh Khắc Của Bạn</h2>
+      <p>Mở ứng dụng <strong>Camera</strong> hoặc <strong>Zalo</strong> trên điện thoại để quét mã QR và tải ảnh ngay về máy:</p>
+
+      <div class="qr-box">
+        <img id="kioskQrCode" src="" alt="Mã QR tải ảnh">
+      </div>
+
+      <div class="auto-reset-timer" id="kioskAutoResetTimer">Tự động kết thúc sau 45s</div>
+      <button class="btn-next-customer" id="btnNextCustomer">LƯỢT TIẾP THEO</button>
+    </div>
+  </section>
+
+</main>
+
+</body>
+</html>

@@ -206,5 +206,27 @@ class SystemTest(unittest.TestCase):
         self.assertTrue(ok)
         self.assertIsNotNone(self.booth.camera.frame)
 
+    def test_kiosk_qr_and_download(self):
+        res = self.client.get('/kiosk')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b'KIOSK PHOTOBOOTH', res.data)
+        self.assertEqual(self.client.get('/api/qr/nonexistent.png').status_code, 404)
+        self.assertEqual(self.client.get('/download/nonexistent').status_code, 404)
+        sid = 'test-session-12345'
+        self.store.create(sid, 'test-visitor')
+        test_file = f'{sid}_strip.jpg'
+        (self.store.photos / test_file).write_bytes(b'dummy-image-data')
+        self.store.finish(sid, 'complete', [test_file])
+        qr_res = self.client.get(f'/api/qr/{sid}.png')
+        self.assertEqual(qr_res.status_code, 200)
+        self.assertEqual(qr_res.mimetype, 'image/png')
+        self.assertGreater(len(qr_res.data), 100)
+        dl_res = self.client.get(f'/download/{sid}')
+        self.assertEqual(dl_res.status_code, 200)
+        file_res = self.client.get(f'/download/{sid}/{test_file}')
+        self.assertEqual(file_res.status_code, 200)
+        self.assertEqual(file_res.data, b'dummy-image-data')
+        file_res.close()
+
 
 if __name__=='__main__': unittest.main()

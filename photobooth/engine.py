@@ -28,6 +28,7 @@ class Booth:
         self.sid=None
         self.frames=[]
         self.files=[]
+        self.last_completed_sid=None
         self.countdown=0
         self.next_shot=0
         self.last_seen=0
@@ -159,6 +160,7 @@ class Booth:
                     self._write(f'{self.sid}_{len(self.frames)}.jpg',self.camera.with_frame(self.frames[-1],self.frame))
                     if len(self.frames)>=self.capture_config['photo_count']:
                         self._write(f'{self.sid}_strip.jpg',self.camera.collage(self.frames,self.frame))
+                        self.last_completed_sid=self.sid
                         self._finish('complete')
                     else:
                         self.next_shot=now+self.capture_config['countdown']
@@ -241,7 +243,7 @@ class Booth:
                 demo=self.demo, hardware=self.hardware.enabled, skip_sensor=self.skip_sensor, owned=self.owner==owner,
                 busy=bool(self.owner and self.owner!=owner and (self.lease>time.monotonic() or self.state=='capturing')),
                 filter=self.effects[0] if self.effects else 'none', selected_filters=list(self.effects), frame=self.frame, countdown=self.countdown, taken=len(self.frames) if self.state=='capturing' else 0,
-                total=self.store.settings()['photo_count'], free_mb=shutil.disk_usage(self.store.root).free//(1024*1024) if admin else None)
+                total=self.store.settings()['photo_count'], last_sid=self.last_completed_sid, free_mb=shutil.disk_usage(self.store.root).free//(1024*1024) if admin else None)
 
     def close(self):
         self.shutdown.set()

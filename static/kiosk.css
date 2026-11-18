@@ -1,0 +1,478 @@
+/* ==========================================================================
+   Pi Studio — Fullscreen Kiosk Mode Style Sheet
+   ========================================================================== */
+
+:root {
+  --kiosk-bg: #111a16;
+  --kiosk-panel: #182620;
+  --kiosk-card: #20332b;
+  --kiosk-ink: #f4f6f0;
+  --kiosk-muted: #95a39a;
+  --kiosk-accent: #dafa7b;
+  --kiosk-green: #488062;
+  --kiosk-danger: #cf5c4a;
+  --kiosk-line: #2d453a;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+}
+
+body.kiosk-body {
+  margin: 0;
+  background: var(--kiosk-bg);
+  color: var(--kiosk-ink);
+  font: 16px/1.5 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   Kiosk Header & Status
+   ========================================================================== */
+
+.kiosk-header {
+  height: 60px;
+  padding: 0 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--kiosk-line);
+  background: rgba(17, 26, 22, 0.95);
+  z-index: 100;
+}
+
+.kiosk-brand {
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: 2px;
+  color: var(--kiosk-ink);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kiosk-brand span {
+  font-size: 11px;
+  color: var(--kiosk-muted);
+  letter-spacing: 1px;
+}
+
+.kiosk-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  font-family: monospace;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--kiosk-card);
+  border: 1px solid var(--kiosk-line);
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--kiosk-accent);
+  box-shadow: 0 0 8px var(--kiosk-accent);
+}
+
+.dot.offline {
+  background: var(--kiosk-danger);
+  box-shadow: 0 0 8px var(--kiosk-danger);
+}
+
+/* ==========================================================================
+   Kiosk Main Stage
+   ========================================================================== */
+
+.kiosk-stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  overflow: hidden;
+}
+
+.kiosk-view {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.kiosk-view.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ==========================================================================
+   View 1: Welcome & Attract Mode
+   ========================================================================== */
+
+.view-welcome {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px;
+  background: radial-gradient(circle at center, #1e332a 0%, #111a16 70%);
+}
+
+.welcome-logo {
+  font-size: 80px;
+  color: var(--kiosk-accent);
+  margin-bottom: 10px;
+  animation: pulse 2.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(218, 250, 123, 0.4)); }
+  50% { transform: scale(1.08); filter: drop-shadow(0 0 25px rgba(218, 250, 123, 0.8)); }
+}
+
+.welcome-title {
+  font-size: 52px;
+  font-weight: 850;
+  letter-spacing: -1px;
+  margin: 0 0 12px;
+}
+
+.welcome-desc {
+  font-size: 20px;
+  color: var(--kiosk-muted);
+  max-width: 600px;
+  margin: 0 0 36px;
+}
+
+.welcome-gestures-guide {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.gesture-guide-item {
+  background: var(--kiosk-card);
+  border: 1px solid var(--kiosk-line);
+  padding: 16px 20px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gesture-icon {
+  font-size: 32px;
+}
+
+.gesture-text strong {
+  display: block;
+  font-size: 14px;
+}
+
+.gesture-text small {
+  color: var(--kiosk-muted);
+  font-size: 11px;
+}
+
+.btn-big-start {
+  background: var(--kiosk-accent);
+  color: var(--kiosk-bg);
+  border: 0;
+  border-radius: 20px;
+  padding: 20px 48px;
+  font-size: 22px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(218, 250, 123, 0.25);
+  transition: transform 0.15s, filter 0.15s;
+}
+
+.btn-big-start:hover {
+  filter: brightness(1.1);
+  transform: scale(1.03);
+}
+
+.btn-big-start:active {
+  transform: scale(0.97);
+}
+
+/* ==========================================================================
+   View 2: Active Camera & Studio
+   ========================================================================== */
+
+.view-studio {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  padding: 24px 32px;
+  width: 100%;
+  height: 100%;
+}
+
+.studio-main {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 0;
+}
+
+.kiosk-viewfinder {
+  flex: 1;
+  position: relative;
+  background: #000;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid var(--kiosk-line);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kiosk-viewfinder img#kioskPreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.kiosk-countdown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 140px;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 4px 40px rgba(0,0,0,0.85);
+  background: rgba(0,0,0,0.25);
+  z-index: 10;
+}
+
+.kiosk-countdown[hidden] {
+  display: none;
+}
+
+.kiosk-progress {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(17, 26, 22, 0.85);
+  border: 1px solid var(--kiosk-line);
+  padding: 8px 18px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--kiosk-accent);
+  z-index: 10;
+}
+
+#kioskFlash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+  transition: opacity 0.12s ease-out;
+}
+
+#kioskFlash.flash {
+  opacity: 0.98;
+  transition: none;
+}
+
+.kiosk-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.kiosk-sidebar-panel {
+  background: var(--kiosk-panel);
+  border: 1px solid var(--kiosk-line);
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.kiosk-sidebar-panel h3 {
+  margin: 0 0 12px;
+  font-size: 16px;
+  color: var(--kiosk-accent);
+  letter-spacing: 1px;
+}
+
+.filter-pills {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.filter-pill {
+  background: var(--kiosk-card);
+  border: 1px solid var(--kiosk-line);
+  color: var(--kiosk-ink);
+  padding: 12px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+
+.filter-pill.active {
+  background: var(--kiosk-accent);
+  color: var(--kiosk-bg);
+  border-color: var(--kiosk-accent);
+  box-shadow: 0 0 12px rgba(218, 250, 123, 0.3);
+}
+
+.btn-kiosk-snap {
+  background: var(--kiosk-accent);
+  color: var(--kiosk-bg);
+  border: 0;
+  border-radius: 16px;
+  padding: 20px;
+  font-size: 18px;
+  font-weight: 800;
+  width: 100%;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(218, 250, 123, 0.2);
+  transition: transform 0.1s, filter 0.15s;
+}
+
+.btn-kiosk-snap:hover {
+  filter: brightness(1.1);
+}
+
+.btn-kiosk-snap:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.kiosk-gesture-banner {
+  background: var(--kiosk-card);
+  border: 1px solid var(--kiosk-line);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--kiosk-muted);
+}
+
+/* ==========================================================================
+   View 3: Results & QR Code Screen
+   ========================================================================== */
+
+.view-result {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 40px;
+  padding: 32px 60px;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #1e332a 0%, #111a16 80%);
+}
+
+.result-photo-column {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.result-photo-frame {
+  max-height: 80vh;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  border: 3px solid rgba(255,255,255,0.1);
+  overflow: hidden;
+}
+
+.result-photo-frame img {
+  max-height: 80vh;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+.result-qr-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: var(--kiosk-panel);
+  border: 1px solid var(--kiosk-line);
+  border-radius: 28px;
+  padding: 36px 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.result-qr-column h2 {
+  font-size: 30px;
+  margin: 0 0 8px;
+  color: var(--kiosk-accent);
+}
+
+.result-qr-column p {
+  color: var(--kiosk-muted);
+  font-size: 15px;
+  margin: 0 0 24px;
+  max-width: 360px;
+}
+
+.qr-box {
+  background: #fff;
+  padding: 16px;
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  margin-bottom: 24px;
+}
+
+.qr-box img {
+  width: 240px;
+  height: 240px;
+  display: block;
+}
+
+.auto-reset-timer {
+  font-size: 13px;
+  color: var(--kiosk-muted);
+  margin-bottom: 16px;
+}
+
+.btn-next-customer {
+  background: var(--kiosk-card);
+  border: 1px solid var(--kiosk-line);
+  color: var(--kiosk-ink);
+  padding: 14px 32px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-next-customer:hover {
+  background: var(--kiosk-green);
+  border-color: var(--kiosk-green);
+}

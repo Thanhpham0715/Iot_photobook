@@ -48,8 +48,8 @@ def create_app(data_dir=None, demo=False, hardware=False, camera=0, start_worker
         response.headers['X-Content-Type-Options']='nosniff'
         response.headers['X-Frame-Options']='DENY'
         response.headers['Referrer-Policy']='same-origin'
-        response.headers['Content-Security-Policy']="default-src 'self'; img-src 'self' blob:; style-src 'self'; script-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
-        if request.path.startswith(('/api','/media')): response.headers['Cache-Control']='no-store'
+        response.headers['Content-Security-Policy']="default-src 'self'; img-src 'self' blob: data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+        if request.path.startswith(('/api','/media','/download')): response.headers['Cache-Control']='no-store'
         return response
 
     @app.errorhandler(ValueError)
@@ -72,6 +72,36 @@ def create_app(data_dir=None, demo=False, hardware=False, camera=0, start_worker
     @app.get('/')
     @app.get('/admin')
     def index(): return render_template('index.html',csrf=session['csrf'],admin_page=request.path=='/admin')
+
+    @app.get('/kiosk')
+    def kiosk(): return render_template('kiosk.html',csrf=session['csrf'])
+
+    @app.get('/download/<sid>')
+    def download(sid):
+        sess=store.get_session(sid)
+        if not sess: abort(404)
+        return render_template('download.html',sess=sess,sid=sid)
+
+    @app.get('/download/<sid>/<path:filename>')
+    def download_file(sid,filename):
+        sess=store.get_session(sid)
+        if not sess or filename not in sess['files']: abort(404)
+        return send_from_directory(store.photos,filename,as_attachment=request.args.get('view')!='1')
+
+    @app.get('/api/qr/<sid>.png')
+    def qr_code(sid):
+        sess=store.get_session(sid)
+        if not sess: abort(404)
+        import io, qrcode
+        download_url=request.host_url.rstrip('/')+f'/download/{sid}'
+        qr=qrcode.QRCode(version=1,box_size=8,border=2)
+        qr.add_data(download_url)
+        qr.make(fit=True)
+        img=qr.make_image(fill_color='#253b32',back_color='#fffefa')
+        buf=io.BytesIO()
+        img.save(buf,format='PNG')
+        buf.seek(0)
+        return app.response_class(buf.getvalue(),mimetype='image/png')
 
     @app.get('/api/status')
     def status():
@@ -176,7 +206,12 @@ def create_app(data_dir=None, demo=False, hardware=False, camera=0, start_worker
     @app.get('/media/<name>')
     def media(name):
         allowed=store.sessions(None if session.get('admin') else session['visitor'])
-        if not any(name in s['files'] for s in allowed): abort(404)
+        allowed_files=[f for s in allowed for f in s['files']]
+        sid=request.args.get('sid')
+        if sid:
+            sess=store.get_session(sid)
+            if sess and name in sess['files']: allowed_files.append(name)
+        if name not in allowed_files: abort(404)
         return send_from_directory(store.photos,name,as_attachment=request.args.get('download')=='1')
 
     @app.delete('/api/sessions/<sid>')

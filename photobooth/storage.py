@@ -65,6 +65,13 @@ class Store:
             rows = self.db.execute(query + (' WHERE owner=?' if owner else '') + ' ORDER BY created DESC', (owner,) if owner else ()).fetchall()
             return [dict(id=r['id'], created=r['created'], status=r['status'], files=json.loads(r['files'])) for r in rows]
 
+    def get_session(self, sid):
+        with self.lock:
+            row = self.db.execute('SELECT * FROM sessions WHERE id=?', (sid,)).fetchone()
+            if not row:
+                return None
+            return dict(id=row['id'], owner=row['owner'], created=row['created'], status=row['status'], files=json.loads(row['files']))
+
     def delete(self, sid):
         with self.lock:
             row = self.db.execute('SELECT files FROM sessions WHERE id=?', (sid,)).fetchone()
