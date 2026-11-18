@@ -190,5 +190,21 @@ class SystemTest(unittest.TestCase):
         self.assertFalse(self.store.sessions())
         self.assertFalse((self.store.photos/'old.jpg').exists())
 
+    def test_rotation_without_cropping(self):
+        import numpy as np
+        from photobooth.imaging import Imaging
+        img = np.zeros((100, 200, 4), dtype=np.uint8)
+        img[20:80, 20:180] = (255, 0, 0, 255)
+        same = Imaging.rotate_without_cropping(img, 0.0)
+        self.assertEqual(same.shape, img.shape)
+        rot45 = Imaging.rotate_without_cropping(img, 45.0)
+        self.assertGreater(rot45.shape[0], img.shape[0])
+        self.assertGreater(rot45.shape[1], img.shape[1])
+        self.assertGreater(np.sum(rot45[:, :, 3] > 0), 0)
+        self.booth.camera.face_angles = [25.0]
+        ok = self.booth.camera.read(['glasses', 'hat'], 'none')
+        self.assertTrue(ok)
+        self.assertIsNotNone(self.booth.camera.frame)
+
 
 if __name__=='__main__': unittest.main()

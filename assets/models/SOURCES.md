@@ -6,6 +6,12 @@ https://github.com/opencv/opencv/blob/4.10.0/data/haarcascades/haarcascade_front
 Giữ nguyên phần thông tin giấy phép Intel trong đầu file XML.
 Không cần mạng để nhận diện khi chạy hệ thống.
 
+# Eye detector
+
+haarcascade_eye.xml: bản gốc từ OpenCV 4.10.0.
+https://github.com/opencv/opencv/blob/4.10.0/data/haarcascades/haarcascade_eye.xml
+Dùng để xác định góc nghiêng mặt và xoay filter không cắt góc.
+
 # Gesture recognizer
 
 gesture_recognizer.task: MediaPipe Gesture Recognizer, float16, version 1.
