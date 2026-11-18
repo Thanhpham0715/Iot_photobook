@@ -4,7 +4,36 @@ const isAdmin=document.querySelector('meta[name=page]').content==='admin';
 const csrf=document.querySelector('meta[name=csrf-token]').content;
 const states={stopped:'Đã dừng',waiting:'Đang chờ người',ready:'Sẵn sàng',capturing:'Đang chụp'};
 let status=null, previousState='', settingsLoaded=false, optionsKey='', sessionKey='', previewUrl=null, noticeTimer;
-let gestureLogKey='';
+let gestureLogKey='', prevCountdown=-1, prevTaken=0, audioCtx=null;
+
+function getAudioContext(){
+ if(!audioCtx){
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(AC)audioCtx=new AC();
+ }
+ if(audioCtx&&audioCtx.state==='suspended')audioCtx.resume();
+ return audioCtx;
+}
+function playBeep(freq=880,duration=0.12,type='sine'){
+ try{
+  const ctx=getAudioContext();if(!ctx)return;
+  const osc=ctx.createOscillator(),gain=ctx.createGain();
+  osc.type=type;osc.frequency.setValueAtTime(freq,ctx.currentTime);
+  gain.gain.setValueAtTime(0.18,ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+duration);
+  osc.connect(gain);gain.connect(ctx.destination);
+  osc.start();osc.stop(ctx.currentTime+duration);
+ }catch(e){}
+}
+function playShutterSound(){
+ try{
+  [520,680,850].forEach((freq,idx)=>{setTimeout(()=>playBeep(freq,0.08,'triangle'),idx*25);});
+ }catch(e){}
+}
+function triggerFlash(){
+ const flash=$('flashOverlay');if(!flash)return;
+ flash.classList.add('flash');setTimeout(()=>flash.classList.remove('flash'),120);
+}
 const gestureNames={Open_Palm:'Bàn tay mở',Thumb_Up:'Giơ ngón cái',Victory:'Chữ V',Pointing_Up:'Trỏ lên',Closed_Fist:'Nắm tay',None:'Chưa xác định'};
 let selectionPending=0, selectionVersion=0, selectionQueue=Promise.resolve();
 function notice(text){$('notice').textContent=text;clearTimeout(noticeTimer);noticeTimer=setTimeout(()=>{$('notice').textContent='';},8000);}
@@ -56,6 +85,11 @@ async function refresh(){
  $('capture').disabled||=!s.camera_ready||selectionPending>0;
  $('countdown').hidden=s.state!=='capturing'||!s.owned;$('countdown').textContent=s.countdown||'📸';
  $('progress').hidden=s.state!=='capturing'||!s.owned;$('progress').textContent=`Đã chụp ${s.taken} / ${s.total}`;
+ if(s.state==='capturing'&&s.owned){
+  if(s.countdown!==prevCountdown&&s.countdown>0)playBeep(880,0.12);
+  if(s.taken>prevTaken){playShutterSound();triggerFlash();}
+  prevCountdown=s.countdown;prevTaken=s.taken;
+ }else{prevCountdown=-1;prevTaken=0;}
  const key=JSON.stringify([s.filters,s.frames]);
  if(key!==optionsKey){
   $('effectChoices').replaceChildren(...s.filters.filter(f=>f.id!=='none').map(f=>{
@@ -91,7 +125,7 @@ async function previewLoop(){
  try{const r=await fetch('/api/preview.jpg',{cache:'no-store'});if(r.ok&&r.status!==204){const next=URL.createObjectURL(await r.blob());$('preview').src=next;if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=next;}}catch(e){/* status polling handles reconnect */}
  }setTimeout(previewLoop,160);
 }
-bind('claim',()=>api('/api/claim','POST',{}));bind('release',()=>api('/api/release','POST',{}));bind('capture',async()=>{$('capture').disabled=true;await selectionQueue;await api('/api/capture','POST',{});});
+bind('claim',()=>{getAudioContext();return api('/api/claim','POST',{});});bind('release',()=>api('/api/release','POST',{}));bind('capture',async()=>{getAudioContext();$('capture').disabled=true;await selectionQueue;await api('/api/capture','POST',{});});
 function saveSelection(){
  const data={filters:[...$('effectChoices').querySelectorAll('input:checked')].map(input=>input.value),frame:$('frame').value};
  selectionPending++;selectionVersion++;$('capture').disabled=true;
