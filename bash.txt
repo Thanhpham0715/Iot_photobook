@@ -1,0 +1,1 @@
+.venv-gestures/bin/python manage.py run --hardware --skip-sensor --led-pin 27

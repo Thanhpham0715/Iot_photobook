@@ -1,0 +1,19 @@
+[Unit]
+Description=Pi Studio Photobooth
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/cuoiky
+ExecStart=/home/pi/cuoiky/.venv-gestures/bin/python /home/pi/cuoiky/manage.py run --hardware
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGINT
+TimeoutStopSec=15
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

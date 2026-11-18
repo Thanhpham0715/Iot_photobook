@@ -1,0 +1,4 @@
+{
+  "glasses": {"label": "Kính", "file": "glasses.png", "width": 1.05, "anchor_y": 0.4},
+  "hat": {"label": "Mũ", "file": "hat.png", "width": 1.45, "anchor_y": -0.12}
+}
